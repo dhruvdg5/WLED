@@ -3,8 +3,8 @@
 
 #include <Relay16.h>
 #include <ESPAsyncWebServer.h>
-#include <SPIFFS.h>
-#include <AsyncTCP.h>
+
+#include <LITTLEFS.h>
 
 // Constructor
 Relay16::Relay16() {
@@ -165,7 +165,30 @@ bool Relay16::handleButton(uint8_t buttonIdx) {
 
 // Initialize the usermod
 void Relay16::setup() {
+Serial.println("SETUP STARTED");
+   Serial.begin(115200);
+  if (!LITTLEFS.begin()) { // Attempt to mount LittleFS
+    Serial.println("Failed to mount LittleFS filesystem!");
+    return;
+  }
+ // Check the total and used bytes on SPIFFS
+  size_t totalBytes = LITTLEFS.totalBytes();
+  size_t usedBytes = LITTLEFS.usedBytes();
+
+  Serial.print("Total LITTLEFS space: ");
+  Serial.print(totalBytes);
+  Serial.println(" bytes");
+
+  Serial.print("Used LITTLEFS space: ");
+  Serial.print(usedBytes);
+  Serial.println(" bytes");
+
+  Serial.print("Available LITTLEFS space: ");
+  Serial.print(totalBytes - usedBytes);
+  Serial.println(" bytes");
+
   // Loop through the relay pins
+  
   for (uint8_t i = 0; i < MAX_RELAYS; i++) {
     // Set the pin and state of each relay object
     _relays[i].pin = relayPins[i];
@@ -174,15 +197,19 @@ void Relay16::setup() {
     pinMode(relayPins[i], OUTPUT);
   }
 
-  // Register the "/relay_control" endpoint to serve the HTML page
-  server.on("/relay_control", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (SPIFFS.exists("/relay_control.html")) {
-      request->send(SPIFFS, "/relay_control.html", "text/html");
-    } else {
-      request->send(404);
-    }
-  });
 
+    server.on("/relay_control.html", HTTP_GET, [](AsyncWebServerRequest *request){
+      Serial.println("Received request for /relay_control.html");
+    if (LITTLEFS.exists("/relay_control.html")) {
+    Serial.println("Serving /relay_control.html");
+    request->send(LITTLEFS, "/relay_control.html", "text/html");
+      } else {
+    Serial.println("/relay_control.html not found");
+    request->send(404);
+    }
+    });
+
+ 
   // Register the "/win" endpoint to handle switch renaming
   server.on("/win", HTTP_GET, [this](AsyncWebServerRequest *request) {
     if (request->hasArg("rename")) {
