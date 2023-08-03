@@ -37,6 +37,8 @@ void Relay16::renameSwitch(AsyncWebServerRequest &request) {
 
 // Generate the HTML page dynamically
 void Relay16::addToPage(AsyncWebServerRequest &request) {
+
+
   String html = R"(
     <!DOCTYPE html>
     <html>
@@ -107,12 +109,59 @@ void Relay16::addToPage(AsyncWebServerRequest &request) {
     </body>
     </html>
   )";
-  
-
-  
-
   request.send(200, "text/html", html);
 }
+
+void Relay16::toggleRelay(uint8_t index) {
+  if (index < MAX_RELAYS) {
+    _relays[index].state = !_relays[index].state;
+    digitalWrite(_relays[index].pin, _relays[index].state ? HIGH : LOW);
+  }
+}
+
+int8_t Relay16::getRelayPin(uint8_t index) {
+  if (index < MAX_RELAYS) {
+    return _relays[index].pin;
+  }
+  return -1; // Return an invalid value if the index is out of range
+}
+bool Relay16::getRelayState(uint8_t index) {
+  if (index < MAX_RELAYS) {
+    return _relays[index].state;
+  }
+  return false; // Return false if the index is out of range
+}
+void Relay16::setRelayPin(uint8_t index, uint8_t pin) {
+  if (index < MAX_RELAYS) {
+    _relays[index].pin = pin;
+  }
+}
+
+void Relay16::setRelayState(uint8_t index, bool state) {
+  if (index < MAX_RELAYS) {
+    _relays[index].state = state;
+    digitalWrite(_relays[index].pin, state ? HIGH : LOW);
+  }
+}
+
+bool Relay16::handleButton(uint8_t buttonIdx) {
+  // This function is called when a button is pressed on WLED's web interface.
+  // You can implement custom logic here to handle button presses.
+  // For example, you can toggle a specific relay when a button is pressed.
+  
+  // Here's an example of how you can toggle relay 0 when button 0 is pressed:
+  if (buttonIdx == 0) {
+    toggleRelay(0);
+    return true; // Return true to indicate that the button press is handled by this usermod
+  }
+
+  // If the button press is not handled by this usermod, return false.
+  return false;
+}
+
+
+
+
 
 // Initialize the usermod
 void Relay16::setup() {
