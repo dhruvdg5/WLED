@@ -3,9 +3,6 @@
 
 #pragma once // add this line
 
-#ifndef WLED_ENABLE_USERMOD_RELAY16 // change this line
-#error "To use usermod Relay16, please go to Tools -> WLED Defines and uncomment #define WLED_ENABLE_USERMOD_RELAY16"
-#endif
 
 #include <WLED.h>
 
@@ -54,8 +51,9 @@ public:
   // toggle a relay
   void toggleRelay(uint8_t index);
 
-  void renameSwitch(AsyncWebServer* server);
-  void addToPage(AsyncWebServer* server);
+  void renameSwitch(AsyncWebServerRequest &request) ;
+
+  void addToPage(AsyncWebServerRequest &request);
   // usermod methods
   void setup() override;
   void loop() override;

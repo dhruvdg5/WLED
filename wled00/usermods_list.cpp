@@ -9,7 +9,9 @@
  * || || ||
  * \/ \/ \/
  */
-#include "../usermods/relay 8_16channel/Relay16.h"
+#include <Relay16.h>
+
+
 
 #ifdef USERMOD_BATTERY
   #include "../usermods/Battery/usermod_v2_Battery.h"
@@ -359,4 +361,5 @@ void registerUsermods()
   #endif
 
   usermods.add(new Relay16());
+  
 }
