@@ -86,7 +86,6 @@ void toggleRelay(int index) {
     // do nothing if the index is invalid
   }
 }
-
 private:
   struct Relay {
     int pin;
@@ -96,14 +95,48 @@ private:
   Relay _relays[MAX_RELAYS];
 
 public:
-  void setup() override;
-  void loop() override;
-  bool handleButton(uint8_t buttonIdx) override;
-  void addToJsonState(JsonObject &root) override;
-  void readFromJsonState(JsonObject &root) override;
-  void addToJsonInfo(JsonObject &root) override;
-  void addToConfig(JsonObject &root) override;
-  bool readFromConfig(JsonObject &root) override;
+
+  // setup function that runs once at boot
+void setup() override;
+// loop function that runs every loop cycle
+void loop() override;
+// button handler function that runs when a button is pressed
+// returns true if the button press was handled, false otherwise
+bool handleButton(uint8_t buttonIdx) override;
+// JSON state function that adds usermod data to the JSON object
+void addToJsonState(JsonObject &root) override;
+// JSON state function that reads usermod data from the JSON object
+void readFromJsonState(JsonObject &root) override;
+// JSON info function that adds usermod info to the JSON object
+void addToJsonInfo(JsonObject &root) override;
+// config function that adds usermod settings to the config file
+void addToConfig(JsonObject &root) override;
+// config function that reads usermod settings from the config file
+// returns true if successful, false otherwise
+bool readFromConfig(JsonObject &root) override;a
+
+  // this function is used to identify your usermod. It should return a unique identifier for your usermod.
+    uint16_t getId() {
+      return USERMOD_ID_MY_USERMOD; // define this macro in const.h
+    }
+
+    // this function is used to name your usermod. It should return a descriptive name for your usermod.
+    String getName() {
+      return F("My Usermod"); // F macro to reduce RAM usage
+    }
+
+    
+    // this function is called every time WiFi is (re)connected. You can use it to sync time or get data from the internet.
+    void connected() {
+      // do some network-related stuff here, such as getting NTP time, weather data, etc.
+    }
+
+    // this function is called every time WiFi is disconnected. You can use it to handle network loss gracefully.
+    void disconnected() {
+      // do some network-related stuff here, such as setting a fallback mode, etc.
+    }  // this function is called once at boot. You can use it to initialize your usermod.
+   
+
 };
 
 #endif  
