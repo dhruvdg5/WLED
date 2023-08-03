@@ -11,8 +11,36 @@
 
 #define MAX_RELAYS 16 // Define the maximum number of relays you want to control
 
+
+#define LED_PIN 16 // Define the pin number for the LED data pin
+
+
+//relay pins
+const int relayPins[MAX_RELAYS] = {
+  4, // D4
+  5, // D5
+  12, // D12
+  13, // D13
+  14, // D14
+  15, // D15
+  17, // TX2
+  18, // SCK
+  19, // MISO
+  21, // SDA
+  22, // SCL
+  23, // MOSI
+  25, // DAC_1
+  26, // DAC_2
+  27, // D27
+  32 // D32
+};
+
+
+
 class Relay16 : public Usermod
  {
+
+  public:
     // constructor
 Relay16() {
   // initialize any variables or resources here
@@ -30,8 +58,7 @@ Relay16() {
   }
 }
 
-// relay pins
-const int relayPins[MAX_RELAYS] = { ... }; // change this line
+
 
 // getter method for relay pin
 int getRelayPin(int index) {
@@ -93,6 +120,10 @@ private:
   };
 
   Relay _relays[MAX_RELAYS];
+  // declare the variables here
+  unsigned long lastTime = 0; // last time the relay was toggled
+  unsigned long toggleInterval = 1000; // toggle interval in milliseconds
+  uint8_t currentRelay = 0; // current relay index
 
 public:
   void setup() override;
