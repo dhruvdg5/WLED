@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Relay Control</title>
+  
+  <style>
+    /* Dark theme styles */
+    body {
+      background-color: #1f1f1f;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Styles for the container */
+    #switch-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      grid-gap: 10px;
+      justify-items: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* Styles for the switches */
+    .switch-label {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #fff;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked + .slider {
+      background-color: #4CAF50;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(16px);
+      -ms-transform: translateX(16px);
+      transform: translateX(16px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 24px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+  </style>
+  <script>
+    function toggleSwitch(switchElement) {
+      const switchId = switchElement.id;
+      const isChecked = switchElement.checked;
+      const relayIndex = parseInt(switchId.replace('relay_', ''));
+      
+      // Make an AJAX request to control the relay state
+      const request = new XMLHttpRequest();
+      request.open('GET', '/win&relay=' + relayIndex + '&value=' + (isChecked ? 1 : 0), true);
+      request.send();
+    }
+    
+    function renameSwitch(switchIndex) {
+      const newName = prompt('Enter the new name for the switch:', _relays[switchIndex].name);
+      if (newName !== null) {
+        // Send the new name to the server via an AJAX request
+        const request = new XMLHttpRequest();
+        request.open('GET', '/win&rename=' + switchIndex + '&value=' + encodeURIComponent(newName), true);
+        request.send();
+      }
+    }
+
+    function toggleGroup(groupIndex) {
+      const groupSwitches = GROUP_X; // Array of relay indices in the group
+      const isChecked = document.getElementById('group_' + groupIndex).checked;
+      for (const relayIndex of groupSwitches) {
+        const switchElement = document.getElementById('relay_' + relayIndex);
+        switchElement.checked = isChecked;
+        toggleSwitch(switchElement);
+      }
+    }
+
+
+    function createSwitches() {
+      const container = document.getElementById('switch-container');
+      for (let i = 0; i < 16; i++) {
+        const switchDiv = document.createElement('div');
+        switchDiv.innerHTML = `
+          <div class="switch-label">Switch ${i + 1}</div>
+          <label class="switch">
+            <input type="checkbox" id="relay_${i}" onclick="toggleSwitch(this)">
+            <span class="slider round"></span>
+          </label>
+        `;
+        container.appendChild(switchDiv);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', createSwitches);
+  </script>
+</head>
+<body>
+  <h1>Relay Control</h1>
+  <div id="switch-container"></div>
+    <!-- Group 1 toggle -->
+    <div>
+      <div class="switch-label">Theme 1</div>
+      <label class="switch">
+        <input type="checkbox" id="group_1" onclick="toggleGroup(1)">
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+    <!-- Group 2 toggle -->
+    <div>
+      <div class="switch-label">Theme 2</div>
+      <label class="switch">
+        <input type="checkbox" id="group_2" onclick="toggleGroup(2)">
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+    <!-- Group 3 toggle -->
+    <div>
+      <div class="switch-label">Theme 3</div>
+      <label class="switch">
+        <input type="checkbox" id="group_3" onclick="toggleGroup(3)">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</body>
+</html>

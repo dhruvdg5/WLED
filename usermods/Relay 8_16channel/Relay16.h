@@ -11,12 +11,8 @@
 
 #define MAX_RELAYS 16 // Define the maximum number of relays you want to control
 
-
-#define LED_PIN 16 // Define the pin number for the LED data pin
-
-
 //relay pins
-const int relayPins[MAX_RELAYS] = {
+const uint8_t relayPins[MAX_RELAYS] = {
   4, // D4
   5, // D5
   12, // D12
@@ -35,97 +31,32 @@ const int relayPins[MAX_RELAYS] = {
   32 // D32
 };
 
-
-
-class Relay16 : public Usermod
- {
-
-  public:
-    // constructor
-Relay16() {
-  // initialize any variables or resources here
-  // for example, you can set the default state of the relays to off
-  for (int i = 0; i < MAX_RELAYS; i++) {
-    _relays[i].state = false;
-  }
-}
-// destructor
-~Relay16() {
-  // free any resources here
-  // for example, you can turn off all the relays before destroying the object
-  for (int i = 0; i < MAX_RELAYS; i++) {
-    digitalWrite(_relays[i].pin, LOW);
-  }
-}
-
-
-
-// getter method for relay pin
-int getRelayPin(int index) {
-  // check if the index is valid
-  if (index >= 0 && index < MAX_RELAYS) {
-    // return the pin number of the relay at the given index
-    return _relays[index].pin;
-  } else {
-    // return -1 if the index is invalid
-    return -1;
-  }
-}
-
-// setter method for relay pin
-void setRelayPin(int index, int pin) {
-  // check if the index and pin are valid
-  if (index >= 0 && index < MAX_RELAYS)
-   {
-    // set the pin number of the relay at the given index
-    _relays[index].pin = pin;
-    // set the pin mode as output
-    pinMode(pin, OUTPUT);
-  } else {
-    // do nothing if the index or pin are invalid
-  }
-}
-
-// getter method for relay state
-bool getRelayState(int index) {
-  // check if the index is valid
-  if (index >= 0 && index < MAX_RELAYS) {
-    // return the state of the relay at the given index
-    return _relays[index].state;
-  } else {
-    // return false if the index is invalid
-    return false;
-  }
-}
-
-// setter method for relay state
-void setRelayState(int index, bool state) {
-  // check if the index is valid
-  if (index >= 0 && index < MAX_RELAYS) {
-    // set the state of the relay at the given index
-    _relays[index].state = state;
-    // write the state to the pin
-    digitalWrite(_relays[index].pin, state ? HIGH : LOW);
-  } else {
-    // do nothing if the index is invalid
-  }
-}
-
-void toggleRelay(uint8_t index); // change this line
-
-private:
-  struct Relay {
-    int pin;
-    bool state;
-  };
-
-  Relay _relays[MAX_RELAYS];
-  // declare the variables here
-  unsigned long lastTime = 0; // last time the relay was toggled
-  unsigned long toggleInterval = 1000; // toggle interval in milliseconds
-  uint8_t currentRelay = 0; // current relay index
-
+class Relay16 : public Usermod {
 public:
+  // constructor
+  Relay16();
+
+  // destructor
+  ~Relay16();
+
+  // getter method for relay pin
+  int8_t getRelayPin(uint8_t index);
+
+  // setter method for relay pin
+  void setRelayPin(uint8_t index, uint8_t pin);
+
+  // getter method for relay state
+  bool getRelayState(uint8_t index);
+
+  // setter method for relay state
+  void setRelayState(uint8_t index, bool state);
+
+  // toggle a relay
+  void toggleRelay(uint8_t index);
+
+  void renameSwitch(AsyncWebServer* server);
+  void addToPage(AsyncWebServer* server);
+  // usermod methods
   void setup() override;
   void loop() override;
   bool handleButton(uint8_t buttonIdx) override;
@@ -134,4 +65,19 @@ public:
   void addToJsonInfo(JsonObject &root) override;
   void addToConfig(JsonObject &root) override;
   bool readFromConfig(JsonObject &root) override;
+
+private:
+  struct Relay {
+    uint8_t pin;
+    bool state;
+    String name;
+  };
+
+  Relay _relays[MAX_RELAYS];
+
+  // declare the variables here
+  unsigned long lastTime = 0;            // last time the relay was toggled
+  unsigned long toggleInterval = 1000;   // toggle interval in milliseconds
+  uint8_t currentRelay = 0;              // current relay index
 };
+

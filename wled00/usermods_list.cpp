@@ -9,7 +9,7 @@
  * || || ||
  * \/ \/ \/
  */
-//#include "../usermods/EXAMPLE_v2/usermod_v2_example.h"
+#include "../usermods/relay 8_16channel/Relay16.h"
 
 #ifdef USERMOD_BATTERY
   #include "../usermods/Battery/usermod_v2_Battery.h"
@@ -357,4 +357,6 @@ void registerUsermods()
   #ifdef USERMOD_SHT
   usermods.add(new ShtUsermod());
   #endif
+
+  usermods.add(new Relay16());
 }
